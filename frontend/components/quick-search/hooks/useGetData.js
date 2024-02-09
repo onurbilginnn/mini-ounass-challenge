@@ -7,14 +7,18 @@ const defaultTextObject = { text: "", color: "black" };
 
 const useGetData = () => {
   const [searchText, setSearchText] = React.useState("");
-  const [fetchedData, setFetchedData] = React.useState({});
+  const [fetchedData, setFetchedData] = React.useState({
+    allData: {},
+    isLoading: false,
+  });
   const [errorMessage, setErrorMessage] = React.useState(defaultTextObject);
 
   const getSearchedData = async () => {
     try {
+      setFetchedData({ allData: {}, isLoading: true });
       const searchedData = await axios.get(`${url}=${searchText}`);
       setErrorMessage(defaultTextObject);
-      setFetchedData(searchedData);
+      setFetchedData({ allData: searchedData, isLoading: false });
     } catch (error) {
       const { message } = error;
       if (message.includes("Network"))
@@ -29,10 +33,10 @@ const useGetData = () => {
         });
     }
   };
-
   React.useEffect(() => {
     if (searchText.length > 0) getSearchedData();
-    if (searchText.length === 0) setFetchedData({});
+    if (searchText.length === 0)
+      setFetchedData({ allData: {}, isLoading: false });
   }, [searchText]);
   return {
     setSearchText,
